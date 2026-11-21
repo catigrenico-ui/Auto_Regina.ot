@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#102c49"><title>Solicitar turno | Auto Regina</title>
+<style>
+:root{--navy:#102c49;--gold:#e4bd58;--bg:#f3f6fa;--line:#e4eaf1;--muted:#718096}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#172536;font:15px/1.5 system-ui,Arial,sans-serif;padding:18px}
+main{max-width:560px;margin:20px auto}.card{background:white;border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 8px 24px #102c4910}
+.brand{font-weight:800;color:var(--navy);letter-spacing:1.5px}h1{color:var(--navy);margin:8px 0 4px}.muted{color:var(--muted)}
+label{display:block;font-weight:650;font-size:13px;margin:13px 0 5px}input,select,textarea{width:100%;padding:12px;border:1px solid #d7e0e9;border-radius:9px;font:inherit;background:white}
+button{width:100%;border:0;border-radius:9px;background:var(--navy);color:white;font-weight:700;padding:13px;margin-top:18px;font:inherit}
+#message{margin-top:14px;padding:12px;border-radius:9px;display:none}.ok{display:block!important;background:#e6f7f0;color:#137a57}.bad{display:block!important;background:#fff0f0;color:#9d3333}
+</style></head><body><main><section class="card">
+<div class="brand">AUTO REGINA</div><h1>Solicitar un turno</h1><p class="muted">Completá tus datos y el taller recibirá tu solicitud.</p>
+<form id="form">
+<label>Nombre y apellido</label><input name="name" required maxlength="100" autocomplete="name">
+<label>Teléfono / WhatsApp</label><input name="phone" required maxlength="30" autocomplete="tel">
+<label>Vehículo</label><input name="vehicle" required maxlength="100" placeholder="Marca y modelo">
+<label>Servicio</label><select name="service" required><option value="">Seleccionar...</option><option>Mecánica general</option><option>Electricidad</option><option>Inyección electrónica</option><option>Revisión</option><option>Mantenimiento</option><option>Frenos</option><option>Embrague</option><option>Cambio de aceite</option><option>Otros</option></select>
+<label>Fecha preferida (opcional)</label><input name="date" type="date">
+<label>Detalle (opcional)</label><textarea name="details" rows="3" maxlength="1000"></textarea>
+<button id="send" type="submit">Enviar solicitud</button><div id="message" role="status"></div>
+</form></section><p class="muted" style="text-align:center;font-size:12px">Enviar la solicitud no confirma automáticamente un turno. Auto Regina se comunicará para coordinarlo.</p></main>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+<script>
+const firebaseConfig = {
+  "apiKey": "AIzaSyAPKOuYBpHuqyEVNJOENPUH1113OBvykyk",
+  "authDomain": "autoregina.firebaseapp.com",
+  "databaseURL": "https://autoregina-default-rtdb.firebaseio.com",
+  "projectId": "autoregina",
+  "storageBucket": "autoregina.firebasestorage.app",
+  "messagingSenderId": "525939629424",
+  "appId": "1:525939629424:web:5da2c8ea08b2bc5659c3b5",
+  "measurementId": "G-GJE4HVT7KT"
+};
+firebase.initializeApp(firebaseConfig);
+const db=firebase.database();
+const form=document.getElementById('form'), msg=document.getElementById('message'), send=document.getElementById('send');
+form.addEventListener('submit', async e => {
+ e.preventDefault(); send.disabled=true; send.textContent='Enviando...'; msg.className=''; msg.style.display='none';
+ const d=Object.fromEntries(new FormData(form).entries());
+ d.createdAt = new Date().toISOString(); d.status='Pendiente';
+ try {
+   await db.ref('solicitudes').push(d);
+   msg.textContent='¡Solicitud enviada! Auto Regina se comunicará para confirmar el turno.';
+   msg.className='ok'; form.reset();
+ } catch(err) {
+   msg.textContent='No se pudo enviar. Revisá la conexión y las reglas de Firebase, o comunicate directamente con el taller.';
+   msg.className='bad';
+ } finally { send.disabled=false; send.textContent='Enviar solicitud'; }
+});
+</script></body></html>
