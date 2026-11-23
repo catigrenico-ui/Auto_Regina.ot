@@ -3,141 +3,154 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#102c49">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Solicitar turno | Auto Regina</title>
 
 <style>
-:root {
-  --navy:#102c49;
-  --gold:#e4bd58;
-  --bg:#f3f6fa;
-  --line:#e4eaf1;
-}
 *{box-sizing:border-box}
 body{
   margin:0;
-  padding:18px;
-  background:var(--bg);
-  color:#172536;
-  font:15px/1.5 system-ui,Arial,sans-serif;
+  padding:20px;
+  background:#eef2f7;
+  font-family:Arial,sans-serif;
+  color:#172b43;
 }
-main{max-width:560px;margin:25px auto}
-.card{
+.container{
+  max-width:500px;
+  margin:25px auto;
   background:white;
-  border:1px solid var(--line);
-  border-radius:18px;
-  padding:24px;
-  box-shadow:0 8px 24px #102c4910;
+  padding:25px;
+  border-radius:16px;
+  box-shadow:0 5px 22px #00000012;
 }
-.brand{
-  font-weight:900;
-  color:var(--navy);
-  letter-spacing:2px;
-  font-size:20px;
+.header{
+  text-align:center;
+  margin-bottom:25px;
 }
-h1{color:var(--navy);margin:12px 0 4px}
-.muted{color:#718096}
+.logo{
+  width:65px;
+  height:65px;
+  margin:auto;
+  border-radius:50%;
+  background:#0f2b48;
+  color:#f5d76e;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:25px;
+  font-weight:bold;
+}
+h1{margin:12px 0 5px;font-size:25px}
+.subtitle{color:#64748b;font-size:14px}
 label{
   display:block;
-  font-weight:650;
-  font-size:13px;
-  margin:14px 0 5px;
+  font-weight:bold;
+  margin:15px 0 7px;
+  font-size:14px;
 }
 input,select,textarea{
   width:100%;
-  padding:12px;
-  border:1px solid #d7e0e9;
+  padding:13px;
+  border:1px solid #ccd5df;
   border-radius:9px;
-  font:inherit;
+  font-size:15px;
   background:white;
 }
+textarea{min-height:90px;resize:vertical}
 button{
   width:100%;
+  padding:15px;
+  margin-top:22px;
   border:0;
   border-radius:9px;
-  background:var(--navy);
-  color:white;
-  font-weight:700;
-  padding:14px;
-  margin-top:20px;
-  font:inherit;
+  background:#0f2b48;
+  color:#f5d76e;
+  font-weight:bold;
+  font-size:16px;
   cursor:pointer;
 }
-button:disabled{opacity:.6}
-#message{
-  display:none;
-  margin-top:15px;
-  padding:13px;
-  border-radius:9px;
+button:disabled{opacity:.6;cursor:not-allowed}
+.status{
+  margin-top:17px;
+  padding:12px;
+  border-radius:8px;
+  font-size:14px;
+  text-align:center;
+  background:#f1f5f9;
+  color:#475569;
 }
-.ok{display:block!important;background:#e6f7f0;color:#137a57}
-.bad{display:block!important;background:#fff0f0;color:#9d3333}
+.success{background:#dcfce7;color:#166534}
+.error{background:#fee2e2;color:#991b1b}
+.note{
+  margin-top:18px;
+  text-align:center;
+  color:#64748b;
+  font-size:12px;
+  line-height:1.5;
+}
 </style>
 </head>
 
 <body>
-<main>
-<section class="card">
+<div class="container">
 
-<div class="brand">AUTO REGINA</div>
+  <div class="header">
+    <div class="logo">AR</div>
+    <h1>AUTO REGINA</h1>
+    <div class="subtitle">Solicitud de turno · Servicio mecánico</div>
+  </div>
 
-<h1>Solicitar un turno</h1>
+  <form id="turnoForm">
 
-<p class="muted">
-Completá tus datos y el taller recibirá tu solicitud.
-</p>
+    <label for="nombre">Nombre y apellido *</label>
+    <input id="nombre" required maxlength="100"
+      placeholder="Tu nombre">
 
-<form id="form">
+    <label for="telefono">Teléfono / WhatsApp *</label>
+    <input id="telefono" required maxlength="30"
+      placeholder="Ej: 2984 548329">
 
-<label>Nombre y apellido</label>
-<input name="name" required maxlength="100"
-placeholder="Tu nombre">
+    <label for="vehiculo">Vehículo *</label>
+    <input id="vehiculo" required maxlength="120"
+      placeholder="Marca, modelo y año">
 
-<label>Teléfono / WhatsApp</label>
-<input name="phone" type="tel" required maxlength="30"
-placeholder="Tu teléfono">
+    <label for="servicio">Servicio solicitado *</label>
+    <select id="servicio" required>
+      <option value="">Seleccionar servicio</option>
+      <option>Mecánica general</option>
+      <option>Electricidad</option>
+      <option>Inyección electrónica</option>
+      <option>Revisión</option>
+      <option>Mantenimiento</option>
+      <option>Cambio de aceite</option>
+      <option>Frenos</option>
+      <option>Embrague</option>
+      <option>Otros</option>
+    </select>
 
-<label>Vehículo</label>
-<input name="vehicle" required maxlength="100"
-placeholder="Marca, modelo y patente">
+    <label for="fecha">Fecha preferida</label>
+    <input id="fecha" type="date">
 
-<label>Servicio solicitado</label>
-<select name="service" required>
-<option value="">Seleccionar...</option>
-<option>Mecánica general</option>
-<option>Electricidad</option>
-<option>Inyección electrónica</option>
-<option>Revisión</option>
-<option>Mantenimiento</option>
-<option>Frenos</option>
-<option>Embrague</option>
-<option>Cambio de aceite</option>
-<option>Otros</option>
-</select>
+    <label for="detalles">Comentarios adicionales</label>
+    <textarea id="detalles" maxlength="1000"
+      placeholder="Contanos qué problema tiene el vehículo..."></textarea>
 
-<label>Fecha preferida</label>
-<input name="date" type="date" required>
+    <button type="submit" id="enviar" disabled>
+      CONECTANDO CON EL TALLER...
+    </button>
 
-<label>Comentarios (opcional)</label>
-<textarea name="details" rows="3"
-placeholder="Contanos qué necesita tu vehículo"></textarea>
+  </form>
 
-<button id="send" type="submit">
-ENVIAR SOLICITUD
-</button>
+  <div class="status" id="estado">
+    Conectando con Auto Regina...
+  </div>
 
-<div id="message" role="status"></div>
+  <div class="note">
+    La solicitud no confirma automáticamente el turno.
+    El taller se comunicará con vos para coordinarlo.
+  </div>
 
-</form>
-</section>
-
-<p class="muted" style="text-align:center;font-size:12px">
-Auto Regina · Servicio mecánico
-<br>
-La solicitud no confirma automáticamente el turno.
-</p>
-</main>
+</div>
 
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
@@ -155,60 +168,126 @@ const firebaseConfig = {
   measurementId: "G-GJE4HVT7KT"
 };
 
-firebase.initializeApp(firebaseConfig);
+const estado = document.getElementById("estado");
+const boton = document.getElementById("enviar");
+const formulario = document.getElementById("turnoForm");
 
-const auth = firebase.auth();
-const db = firebase.database();
+let db = null;
+let auth = null;
+let conectado = false;
 
-const form = document.getElementById('form');
-const msg = document.getElementById('message');
-const btn = document.getElementById('send');
+function mostrarEstado(mensaje, tipo=""){
+  estado.textContent = mensaje;
+  estado.className = "status " + tipo;
+}
 
-form.addEventListener('submit', async e => {
+function traducirError(error){
+  const codigo = error && error.code ? error.code : "";
+
+  if(codigo.includes("permission-denied")){
+    return "Firebase rechazó el permiso de escritura. Hay que revisar las reglas de la base de datos.";
+  }
+
+  if(codigo.includes("network-request-failed")){
+    return "No hay conexión con Firebase. Revisá internet e intentá nuevamente.";
+  }
+
+  if(codigo.includes("operation-not-allowed")){
+    return "El acceso anónimo no está habilitado en Firebase Authentication.";
+  }
+
+  if(codigo.includes("unauthorized-domain")){
+    return "El dominio de GitHub Pages no está autorizado en Firebase Authentication.";
+  }
+
+  return "No se pudo conectar: " + (error.message || codigo || "Error desconocido");
+}
+
+async function iniciarFirebase(){
+  try{
+    if(!firebase.apps.length){
+      firebase.initializeApp(firebaseConfig);
+    }
+
+    auth = firebase.auth();
+    db = firebase.database();
+
+    if(!auth.currentUser){
+      await auth.signInAnonymously();
+    }
+
+    conectado = true;
+    boton.disabled = false;
+    boton.textContent = "SOLICITAR TURNO";
+
+    mostrarEstado("Conectado con Auto Regina. Ya podés solicitar tu turno.");
+
+  }catch(error){
+    conectado = false;
+    boton.disabled = true;
+    boton.textContent = "SIN CONEXIÓN";
+    mostrarEstado(traducirError(error), "error");
+    console.error("Error Firebase:", error);
+  }
+}
+
+formulario.addEventListener("submit", async function(e){
   e.preventDefault();
 
-  btn.disabled = true;
-  btn.textContent = 'ENVIANDO...';
+  if(!conectado || !db){
+    mostrarEstado("Todavía no hay conexión con Firebase. Recargá la página.", "error");
+    return;
+  }
 
-  msg.style.display = 'none';
+  const datos = {
+    name: document.getElementById("nombre").value.trim(),
+    phone: document.getElementById("telefono").value.trim(),
+    vehicle: document.getElementById("vehiculo").value.trim(),
+    service: document.getElementById("servicio").value,
+    date: document.getElementById("fecha").value,
+    details: document.getElementById("detalles").value.trim(),
+    status: "Pendiente",
+    createdAt: firebase.database.ServerValue.TIMESTAMP
+  };
 
-  try {
+  if(!datos.name || !datos.phone || !datos.vehicle || !datos.service){
+    mostrarEstado("Completá todos los campos obligatorios.", "error");
+    return;
+  }
 
-    await auth.signInAnonymously();
+  boton.disabled = true;
+  boton.textContent = "ENVIANDO...";
+  mostrarEstado("Guardando solicitud en Auto Regina...");
 
-    const d = Object.fromEntries(
-      new FormData(form).entries()
+  try{
+    if(!auth.currentUser){
+      await auth.signInAnonymously();
+    }
+
+    const referencia = await db.ref("solicitudesTurno").push(datos);
+
+    if(!referencia.key){
+      throw new Error("Firebase no confirmó el registro.");
+    }
+
+    mostrarEstado(
+      "¡Solicitud enviada correctamente! El taller se comunicará con vos para coordinar el turno.",
+      "success"
     );
 
-    d.status = 'Pendiente';
-    d.createdAt = Date.now();
+    formulario.reset();
 
-    await db.ref('solicitudesTurno').push(d);
+  }catch(error){
+    console.error("Error al guardar solicitud:", error);
+    mostrarEstado(traducirError(error), "error");
 
-    msg.textContent =
-      '¡Solicitud enviada correctamente! Auto Regina se comunicará para confirmar tu turno.';
-
-    msg.className = 'ok';
-
-    form.reset();
-
-  } catch(err) {
-
-    console.error(err);
-
-    msg.textContent =
-      'No se pudo enviar la solicitud. Revisá la conexión o las reglas de Firebase.';
-
-    msg.className = 'bad';
-
-  } finally {
-
-    btn.disabled = false;
-    btn.textContent = 'ENVIAR SOLICITUD';
-
+  }finally{
+    boton.disabled = !conectado;
+    boton.textContent = conectado ? "SOLICITAR TURNO" : "SIN CONEXIÓN";
   }
 });
-</script>
 
+iniciarFirebase();
+</script>
 </body>
 </html>
