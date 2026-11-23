@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#102c49">
+<title>Auto Regina | Gestión del taller</title>
+<style>
+:root{--navy:#102c49;--navy2:#173e63;--gold:#e4bd58;--bg:#f3f6fa;--line:#e4eaf1;--green:#15966b;--red:#c94b4b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:#172536;font:15px/1.45 system-ui,Arial}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.sidebar{position:fixed;inset:0 auto 0 0;width:245px;background:var(--navy);color:white;padding:20px 15px;display:flex;flex-direction:column;z-index:5}
+.brand{display:flex;align-items:center;gap:12px;padding:8px;border-bottom:1px solid #ffffff25}
+.brand-mark{width:44px;height:44px;border:2px solid var(--gold);border-radius:50%;display:grid;place-items:center;color:var(--gold);font-size:22px;font-weight:800}
+.brand strong{display:block;letter-spacing:1px}
+.brand small{color:#c8d4e0}
+.nav{display:grid;gap:6px;margin-top:20px}
+.nav button{border:0;background:transparent;color:#d7e1eb;text-align:left;padding:12px;border-radius:9px}
+.nav button.active,.nav button:hover{background:#ffffff20;color:white}
+.side-foot{margin-top:auto;color:#c8d4e0;font-size:12px;padding:12px}
+.main{margin-left:245px;padding:25px;max-width:1500px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:22px}
+.topbar h1{margin:3px 0;color:var(--navy);font-size:25px}
+.eyebrow,.muted{color:#718096;font-size:13px}
+.user-chip{background:white;border:1px solid var(--line);padding:9px;border-radius:20px;font-size:12px}
+.page{display:none}.page.active{display:block}
+.welcome{background:linear-gradient(115deg,var(--navy),var(--navy2));color:white;border-radius:16px;padding:24px;margin-bottom:18px}
+.welcome h2{margin:0 0 5px}.welcome p{margin:0;color:#d5e0eb}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.stat,.panel{background:white;border:1px solid var(--line);border-radius:13px;padding:16px;box-shadow:0 5px 20px #102c4910;margin-bottom:16px}
+.stat strong{display:block;font-size:27px;color:var(--navy);margin-top:8px}
+.stat-top{font-size:13px;color:#718096}
+.panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}
+.panel h3{margin:0;color:var(--navy)}
+.field,select,textarea{width:100%;border:1px solid #d7e0e9;border-radius:9px;padding:11px;background:white;color:#172536}
+label{display:block;font-size:13px;font-weight:650;margin-bottom:6px;color:#435468}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.form-grid .full{grid-column:1/-1}
+.toolbar{display:flex;gap:10px;margin-bottom:14px}
+.search{flex:1}
+.btn{border:0;border-radius:9px;padding:10px 13px;font-weight:650}
+.primary{background:var(--navy);color:white}
+.gold{background:var(--gold);color:#30260d}
+.light{background:#edf2f7;color:var(--navy)}
+.danger{background:#fff0f0;color:var(--red)}
+.small{padding:7px 9px;font-size:12px}
+.table-wrap{overflow:auto}
+table{width:100%;border-collapse:collapse;min-width:620px}
+th,td{text-align:left;padding:11px 9px;border-bottom:1px solid var(--line);font-size:13px}
+th{color:#718096;background:#f9fbfd}
+td strong{color:var(--navy)}
+.actions{display:flex;gap:5px;flex-wrap:wrap}
+.badge{display:inline-block;border-radius:20px;padding:4px 8px;font-size:11px;font-weight:700;background:#edf2f7}
+.badge.green{background:#e6f7f0;color:#137a57}
+.badge.gold{background:#fff5d9;color:#886516}
+.empty{text-align:center;color:#718096;padding:25px}
+.modal-backdrop{position:fixed;inset:0;background:#0c1b2bbb;display:none;align-items:center;justify-content:center;padding:15px;z-index:20}
+.modal-backdrop.show{display:flex}
+.modal{background:white;border-radius:15px;padding:20px;width:min(680px,100%);max-height:92vh;overflow:auto}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.modal-head h2{margin:0;color:var(--navy)}
+.close{border:0;background:#edf2f7;border-radius:8px;padding:7px 12px}
+.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+.notice{padding:12px;background:#fff8e7;border-radius:9px;margin-bottom:12px}
+.quick{display:flex;gap:8px;flex-wrap:wrap}
+@media(max-width:950px){.stats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){
+.sidebar{position:static;width:auto;padding:12px}
+.brand{padding:3px 4px 10px;border:0}
+.nav{display:flex;overflow:auto;margin-top:9px}
+.nav button{white-space:nowrap;padding:9px}
+.side-foot{display:none}
+.main{margin:0;padding:15px 12px}
+.topbar h1{font-size:21px}
+.user-chip{display:none}
+.stats{gap:8px}
+.stat{padding:12px}
+.stat strong{font-size:23px}
+.form-grid{grid-template-columns:1fr}
+.form-grid .full{grid-column:auto}
+.panel{padding:13px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+<div class="brand">
+<div class="brand-mark">AR</div>
+<div><strong>AUTO REGINA</strong><small>Gestión de taller</small></div>
+</div>
+<nav class="nav">
+<button class="active" data-page="inicio">▦ Inicio</button>
+<button data-page="clientes">♙ Clientes</button>
+<button data-page="vehiculos">🚘 Vehículos</button>
+<button data-page="ordenes">▤ Órdenes</button>
+<button data-page="turnos">📅 Solicitudes de turno</button>
+<button data-page="servicios">⚙ Servicios</button>
+</nav>
+<div class="side-foot" id="firebaseStatus">Conectando con Firebase...</div>
+</aside>
+<main class="main">
+<header class="topbar">
+<div><div class="eyebrow">Panel de administración</div><h1 id="pageTitle">Inicio</h1></div>
+<div class="quick">
+<span class="user-chip">🔧 Taller Auto Regina</span>
+<button class="btn light" id="generalQr">QR turnos</button>
+<button class="btn gold" id="quickOrder">+ Nueva orden</button>
+</div>
+</header>
+<section class="page active" id="page-inicio">
+<div class="welcome"><h2>Bienvenido a Auto Regina</h2><p>Administrá clientes, vehículos y trabajos de tu taller.</p></div>
+<div class="stats">
+<div class="stat"><div class="stat-top">Clientes registrados</div><strong id="statClients">0</strong></div>
+<div class="stat"><div class="stat-top">Vehículos</div><strong id="statVehicles">0</strong></div>
+<div class="stat"><div class="stat-top">Órdenes totales</div><strong id="statOrders">0</strong></div>
+<div class="stat"><div class="stat-top">Órdenes pendientes</div><strong id="statPending">0</strong></div>
+</div>
+<div class="panel"><div class="panel-head"><h3>Accesos rápidos</h3></div><div class="quick">
+<button class="btn primary" data-go="clientes">+ Registrar cliente</button>
+<button class="btn light" data-go="vehiculos">+ Registrar vehículo</button>
+<button class="btn light" data-go="ordenes">+ Crear orden</button>
+<button class="btn gold" data-go="turnos">Ver solicitudes</button>
+</div></div>
+<div class="panel"><div class="panel-head"><h3>Últimas órdenes</h3><button class="btn light small" data-go="ordenes">Ver todas</button></div><div id="recentOrders"></div></div>
+</section>
+<section class="page" id="page-clientes"><div class="panel">
+<div class="panel-head"><h3>Clientes</h3><button class="btn primary" id="addClient">+ Nuevo cliente</button></div>
+<div class="toolbar"><input class="field search" id="searchClients" placeholder="Buscar nombre, teléfono o DNI..."></div><div id="clientsTable"></div>
+</div></section>
+<section class="page" id="page-vehiculos"><div class="panel">
+<div class="panel-head"><h3>Vehículos</h3><button class="btn primary" id="addVehicle">+ Nuevo vehículo</button></div>
+<div class="toolbar"><input class="field search" id="searchVehicles" placeholder="Buscar patente, marca o modelo..."></div><div id="vehiclesTable"></div>
+</div></section>
+<section class="page" id="page-ordenes"><div class="panel">
+<div class="panel-head"><h3>Órdenes de trabajo</h3><button class="btn primary" id="addOrder">+ Nueva orden</button></div>
+<div class="toolbar"><input class="field search" id="searchOrders" placeholder="Buscar orden, patente o cliente..."></div><div id="ordersTable"></div>
+</div></section>
+<section class="page" id="page-turnos"><div class="panel">
+<div class="panel-head"><h3>Solicitudes de turno</h3><span class="badge gold" id="turnosCount">0 pendientes</span></div>
+<p class="muted">Solicitudes recibidas desde el formulario público de Auto Regina.</p>
+<div id="turnosTable"></div>
+</div></section>
+<section class="page" id="page-servicios"><div class="panel">
+<div class="panel-head"><h3>Servicios del taller</h3><button class="btn primary" id="addService">+ Agregar servicio</button></div>
+<p class="muted">Categorías de trabajo de Auto Regina.</p><div id="servicesList"></div>
+</div></section>
+</main>
+</div>
+
+<div class="modal-backdrop" id="qrBackdrop"><div class="modal" style="width:min(520px,100%)">
+<div class="modal-head"><h2 id="qrTitle">QR</h2><button class="close" id="closeQr">×</button></div>
+<div style="display:flex;justify-content:center;padding:12px"><div id="qrCanvas"></div></div>
+<p id="qrDescription" class="muted"></p><label>Enlace para compartir</label><input id="qrUrl" class="field" readonly>
+<div class="modal-actions"><button class="btn light" id="copyQr">Copiar enlace</button><button class="btn primary" id="sendQr">Enviar por WhatsApp</button></div>
+</div></div>
+<div class="modal-backdrop" id="modalBackdrop"><div class="modal">
+<div class="modal-head"><h2 id="modalTitle">Formulario</h2><button class="close" id="closeModal">×</button></div>
+<form id="modalForm"><div id="modalFields"></div><div class="modal-actions">
+<button type="button" class="btn light" id="cancelModal">Cancelar</button><button type="submit" class="btn primary">Guardar</button>
+</div></form>
+</div></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+const $=s=>document.querySelector(s);
+const firebaseConfig={
+apiKey:"AIzaSyAPKOuYBpHuqyEVNJOENPUH1113OBvykyk",
+authDomain:"autoregina.firebaseapp.com",
+databaseURL:"https://autoregina-default-rtdb.firebaseio.com",
+projectId:"autoregina",
+storageBucket:"autoregina.firebasestorage.app",
+messagingSenderId:"525939629424",
+appId:"1:525939629424:web:5da2c8ea08b2bc5659c3b5",
+measurementId:"G-GJE4HVT7KT"
+};
+firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth();
+const db=firebase.database();
+let firebaseReady=false;
+let editing=null;
+let currentType=null;
+let solicitudesTurno=[];
+const store={
+clients:[],vehicles:[],orders:[],
+services:['Mecánica general','Electricidad','Inyección electrónica','Revisión','Mantenimiento','Frenos','Embrague','Cambio de aceite','Otros']
+};
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money=n=>new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(Number(n)||0);
+const today=()=>new Date().toISOString().slice(0,10);
+function secureToken(){
+return (crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2))+Math.random().toString(36).slice(2,10);
+}
+async function save(){
+Object.entries(store).forEach(([k,v])=>localStorage.setItem('ar_'+k,JSON.stringify(v)));
+renderAll();
+if(!firebaseReady){alert('Firebase todavía se está conectando. Esperá unos segundos.');return false;}
+try{
+await db.ref('taller').set(store);
+const publicData={};
+store.orders.forEach(o=>{
+if(o.qrToken)publicData[o.qrToken]={
+number:o.number,date:o.date,client:String(o.clientLabel||'').split(' · ')[0],
+vehicle:o.vehicleLabel,service:o.service,status:o.status,km:o.km,total:o.total,
+description:o.description,notes:o.notes,updatedAt:Date.now()
+};
+});
+await db.ref('publicTracking').set(publicData);
+return true;
+}catch(err){console.error(err);alert('No se pudo guardar en Firebase: '+err.message);return false;}
+}
+async function connectFirebase(){
+try{
+await auth.signInAnonymously();
+const snap=await db.ref('taller').once('value');
+if(snap.exists()){
+const data=snap.val()||{};
+store.clients=Array.isArray(data.clients)?data.clients:Object.values(data.clients||{});
+store.vehicles=Array.isArray(data.vehicles)?data.vehicles:Object.values(data.vehicles||{});
+store.orders=Array.isArray(data.orders)?data.orders:Object.values(data.orders||{});
+store.services=Array.isArray(data.services)?data.services:Object.values(data.services||{});
+if(!store.services.length)store.services=['Mecánica general','Electricidad','Inyección electrónica','Revisión','Mantenimiento','Frenos','Embrague','Cambio de aceite','Otros'];
+}
+firebaseReady=true;
+$('#firebaseStatus').textContent='Conectado a Firebase · Datos sincronizados';
+db.ref('solicitudesTurno').on('value',snap=>{
+const data=snap.val()||{};
+solicitudesTurno=Object.entries(data).map(([id,v])=>({id,...v})).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+renderTurnos();
+},err=>{
+console.error(err);
+$('#turnosTable').innerHTML='<div class="empty">No se pudieron cargar las solicitudes. Revisá las reglas de Firebase.</div>';
+});
+renderAll();
+if(!snap.exists())await save();
+}catch(err){
+console.error(err);
+$('#firebaseStatus').textContent='Error de conexión con Firebase';
+alert('No se pudo conectar a Firebase: '+err.message+'. Revisá el acceso anónimo y las reglas de Firebase.');
+}
+}
+function go(page){
+document.querySelectorAll('.page').forEach(x=>x.classList.toggle('active',x.id==='page-'+page));
+document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===page));
+$('#pageTitle').textContent={inicio:'Inicio',clientes:'Clientes',vehiculos:'Vehículos',ordenes:'Órdenes de trabajo',turnos:'Solicitudes de turno',servicios:'Servicios'}[page]||'Auto Regina';
+if(page==='turnos')renderTurnos();
+}
+document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>go(b.dataset.page));
+document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
+function modal(title,fields,type,item=null){
+currentType=type;editing=item?.id||null;
+$('#modalTitle').textContent=title;
+$('#modalFields').innerHTML='<div class="form-grid">'+fields+'</div>';
+$('#modalBackdrop').classList.add('show');
+}
+function closeModal(){$('#modalBackdrop').classList.remove('show');$('#modalForm').reset();editing=null;currentType=null;}
+$('#closeModal').onclick=$('#cancelModal').onclick=closeModal;
+$('#modalBackdrop').onclick=e=>{if(e.target.id==='modalBackdrop')closeModal();};
+function field(name,label,placeholder='',value='',kind='text',full=false,required=false){
+return `<div class="${full?'full':''}"><label>${label}</label><input class="field" name="${name}" type="${kind}" placeholder="${placeholder}" value="${esc(value)}" ${required?'required':''}></div>`;
+}
+function selectField(name,label,options,value='',full=false){
+return `<div class="${full?'full':''}"><label>${label}</label><select name="${name}" class="field" required><option value="">Seleccionar...</option>${options.map(o=>`<option ${o===value?'selected':''} value="${esc(o)}">${esc(o)}</option>`).join('')}</select></div>`;
+}
+function openClient(c=null){
+modal(c?'Editar cliente':'Nuevo cliente',[
+field('name','Nombre y apellido','Nombre completo',c?.name,'text',false,true),
+field('phone','Teléfono / WhatsApp','2984...',c?.phone,'tel',false,true),
+field('dni','DNI / CUIT','Documento',c?.dni),
+field('email','Correo electrónico','correo@ejemplo.com',c?.email,'email'),
+field('address','Dirección','Localidad y dirección',c?.address,'text',true)
+],'client',c);
+}
+function openVehicle(v=null){
+const current=store.clients.find(c=>c.id===v?.clientId);
+modal(v?'Editar vehículo':'Nuevo vehículo',[
+selectField('clientId','Propietario',store.clients.map(c=>c.name+' · '+c.phone),current?current.name+' · '+current.phone:'',true),
+field('plate','Patente','AA123BB',v?.plate,'text',false,true),
+field('brand','Marca','Ej. Renault',v?.brand,'text',false,true),
+field('model','Modelo','Ej. Duster',v?.model,'text',false,true),
+field('year','Año','2020',v?.year,'number'),
+field('km','Kilometraje','Kilómetros',v?.km,'number'),
+field('color','Color','Color',v?.color),
+field('vin','N° de chasis','Opcional',v?.vin)
+],'vehicle',v);
+if(!store.clients.length)$('#modalFields').insertAdjacentHTML('afterbegin','<div class="notice full">Primero registrá un cliente.</div>');
+}
+function openOrder(o=null){
+const clientOpts=store.clients.map(c=>c.name+' · '+c.phone);
+const vehicleOpts=store.vehicles.map(v=>v.plate+' · '+v.brand+' '+v.model);
+modal(o?'Editar orden':'Nueva orden',[
+field('date','Fecha de ingreso','',o?.date||today(),'date'),
+selectField('clientLabel','Cliente',clientOpts,o?.clientLabel||'',true),
+selectField('vehicleLabel','Vehículo / patente',vehicleOpts,o?.vehicleLabel||'',true),
+selectField('service','Tipo de servicio',store.services,o?.service||''),
+selectField('status','Estado',['Pendiente','En reparación','Esperando repuestos','Finalizada','Entregada'],o?.status||'Pendiente'),
+field('km','Kilometraje al ingreso','Km',o?.km,'number'),
+field('total','Total estimado ($)','0',o?.total,'number'),
+field('description','Diagnóstico / trabajo','Detalle',o?.description,'text',true),
+field('notes','Observaciones','Notas',o?.notes,'text',true)
+],'order',o);
+}
+function openService(s=null){
+modal(s?'Editar servicio':'Agregar servicio',[field('name','Nombre del servicio','Ej. Distribución',s?.name||'','text',true,true)],'service',s?{id:s.id,name:s.name}:null);
+}
+$('#addClient').onclick=()=>openClient();
+$('#addVehicle').onclick=()=>openVehicle();
+$('#addOrder').onclick=()=>openOrder();
+$('#addService').onclick=()=>openService();
+$('#quickOrder').onclick=()=>{go('ordenes');openOrder();};
+function showQr(title,description,url,phone=''){
+$('#qrTitle').textContent=title;$('#qrDescription').textContent=description;$('#qrUrl').value=url;$('#qrCanvas').innerHTML='';
+if(window.QRCode)new QRCode($('#qrCanvas'),{text:url,width:220,height:220,colorDark:'#102c49',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
+else $('#qrCanvas').textContent='No se pudo cargar el generador QR.';
+$('#qrBackdrop').classList.add('show');
+$('#sendQr').onclick=()=>{const msg=encodeURIComponent('Hola, te compartimos el acceso de Auto Regina: '+url);window.open('https://wa.me/'+phone+'?text='+msg,'_blank');};
+}
+$('#generalQr').onclick=()=>{
+const url=new URL('solicitar-turno.html',location.href).href;
+showQr('QR para solicitar turnos','Compartí este QR para que tus clientes pidan un turno.',url);
+};
+$('#closeQr').onclick=()=>$('#qrBackdrop').classList.remove('show');
+$('#qrBackdrop').onclick=e=>{if(e.target.id==='qrBackdrop')$('#qrBackdrop').classList.remove('show');};
+$('#copyQr').onclick=async()=>{
+try{await navigator.clipboard.writeText($('#qrUrl').value);$('#copyQr').textContent='Copiado';}
+catch(e){$('#qrUrl').select();document.execCommand('copy');$('#copyQr').textContent='Copiado';}
+};
+$('#modalForm').onsubmit=async e=>{
+e.preventDefault();
+const d=Object.fromEntries(new FormData(e.target));
+const id=editing||crypto.randomUUID();
+if(currentType==='client'){const x={id,...d};store.clients=store.clients.filter(a=>a.id!==id).concat(x);}
+if(currentType==='vehicle'){
+const c=store.clients.find(a=>a.name+' · '+a.phone===d.clientId);
+const x={id,...d,clientId:c?.id||'',clientName:c?.name||d.clientId};
+store.vehicles=store.vehicles.filter(a=>a.id!==id).concat(x);
+}
+if(currentType==='order'){
+const previous=store.orders.find(a=>a.id===id);
+const x={id,number:previous?.number||('OT-'+String(Date.now()).slice(-6)),qrToken:previous?.qrToken||secureToken(),...d};
+store.orders=store.orders.filter(a=>a.id!==id).concat(x);
+}
+if(currentType==='service')store.services.push(d.name);
+closeModal();await save();
+};
+function del(type,id){
+if(!confirm('¿Seguro que querés eliminar este registro?'))return;
+store[type]=store[type].filter(x=>x.id!==id);
+save();
+}
+function table(headers,rows){
+if(!rows.length)return '<div class="empty">Todavía no hay registros.</div>';
+return `<div class="table-wrap"><table><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table></div>`;
+}
+function renderClients(){
+const q=($('#searchClients').value||'').toLowerCase();
+const a=store.clients.filter(c=>[c.name,c.phone,c.dni].join(' ').toLowerCase().includes(q));
+$('#clientsTable').innerHTML=table(['Cliente','Teléfono','DNI / CUIT','Dirección','Acciones'],a.map(c=>`<tr>
+<td><strong>${esc(c.name)}</strong></td><td>${esc(c.phone)}</td><td>${esc(c.dni)}</td><td>${esc(c.address)}</td>
+<td><div class="actions"><button class="btn light small" onclick="editItem('clients','${c.id}')">Editar</button><button class="btn danger small" onclick="del('clients','${c.id}')">Eliminar</button></div></td>
+</tr>`));
+}
+function renderVehicles(){
+const q=($('#searchVehicles').value||'').toLowerCase();
+const a=store.vehicles.filter(v=>[v.plate,v.brand,v.model,v.clientName].join(' ').toLowerCase().includes(q));
+$('#vehiclesTable').innerHTML=table(['Patente','Vehículo','Propietario','Año','Km','Acciones'],a.map(v=>`<tr>
+<td><strong>${esc(v.plate)}</strong></td><td>${esc(v.brand)} ${esc(v.model)}</td><td>${esc(v.clientName)}</td><td>${esc(v.year)}</td><td>${esc(v.km)}</td>
+<td><div class="actions"><button class="btn light small" onclick="editItem('vehicles','${v.id}')">Editar</button><button class="btn danger small" onclick="del('vehicles','${v.id}')">Eliminar</button></div></td>
+</tr>`));
+}
+function renderOrders(){
+const q=($('#searchOrders').value||'').toLowerCase();
+const a=store.orders.filter(o=>[o.number,o.clientLabel,o.vehicleLabel,o.service].join(' ').toLowerCase().includes(q));
+$('#ordersTable').innerHTML=table(['Orden','Fecha','Cliente','Vehículo','Servicio','Estado','Total','Acciones'],a.sort((x,y)=>String(y.date).localeCompare(String(x.date))).map(o=>`<tr>
+<td><strong>${esc(o.number)}</strong></td><td>${esc(o.date)}</td><td>${esc(o.clientLabel)}</td><td>${esc(o.vehicleLabel)}</td><td>${esc(o.service)}</td>
+<td><span class="badge ${o.status==='Finalizada'||o.status==='Entregada'?'green':'gold'}">${esc(o.status)}</span></td><td>${money(o.total)}</td>
+<td><div class="actions"><button class="btn light small" onclick="editItem('orders','${o.id}')">Editar</button><button class="btn gold small" onclick="shareOrderQr('${o.id}')">QR / WhatsApp</button><button class="btn danger small" onclick="del('orders','${o.id}')">Eliminar</button></div></td>
+</tr>`));
+}
+function renderServices(){
+$('#servicesList').innerHTML=store.services.map((s,i)=>`<div style="display:flex;justify-content:space-between;padding:12px;border-bottom:1px solid var(--line)"><span>⚙ ${esc(s)}</span><button class="btn danger small" onclick="removeService(${i})">Quitar</button></div>`).join('')||'<div class="empty">No hay servicios.</div>';
+}
+function removeService(i){if(confirm('¿Quitar este servicio?')){store.services.splice(i,1);save();}}
+
+/* SOLICITUDES DE TURNO: aceptar, rechazar, crear orden y eliminar */
+function renderTurnos(){
+const pendientes=solicitudesTurno.filter(t=>(t.status||'pendiente').toLowerCase()==='pendiente').length;
+$('#turnosCount').textContent=pendientes+' pendientes';
+if(!solicitudesTurno.length){$('#turnosTable').innerHTML='<div class="empty">Todavía no hay solicitudes de turno.</div>';return;}
+$('#turnosTable').innerHTML=table(
+['Cliente','Teléfono','Vehículo','Servicio','Fecha solicitada','Estado','Acciones'],
+solicitudesTurno.map(t=>{
+const estado=(t.status||'pendiente').toLowerCase();
+const acciones=estado==='pendiente'
+? `<button class="btn primary small" onclick="estadoTurno('${t.id}','aceptado')">Aceptar</button><button class="btn danger small" onclick="estadoTurno('${t.id}','rechazado')">Rechazar</button>`
+: `<button class="btn light small" onclick="estadoTurno('${t.id}','pendiente')">Reabrir</button>`;
+const orden=t.orderCreated
+? '<span class="badge green">Orden creada</span>'
+: `<button class="btn gold small" onclick="crearOrdenDesdeTurno('${t.id}')">Crear orden</button>`;
+return `<tr>
+<td><strong>${esc(t.name)}</strong><br><small>${esc(t.details||t.notes||'')}</small></td>
+<td>${esc(t.phone)}</td><td>${esc(t.vehicle)}</td><td>${esc(t.service)}</td><td>${esc(t.date)}</td>
+<td><span class="badge ${estado==='aceptado'?'green':estado==='pendiente'?'gold':''}">${esc(t.status||'Pendiente')}</span></td>
+<td><div class="actions">${acciones}${orden}<button class="btn danger small" onclick="eliminarTurno('${t.id}')">Eliminar</button></div></td>
+</tr>`;
+})
+);
+}
+window.estadoTurno=async(id,status)=>{
+try{await db.ref('solicitudesTurno/'+id).update({status,updatedAt:firebase.database.ServerValue.TIMESTAMP});}
+catch(e){alert('No se pudo actualizar el turno: '+e.message);}
+};
+window.eliminarTurno=async(id)=>{
+const turno=solicitudesTurno.find(t=>t.id===id);
+if(!turno){alert('No se encontró la solicitud. Actualizá la página e intentá nuevamente.');return;}
+const nombre=turno.name||'esta solicitud';
+if(!confirm('¿Estás seguro de que querés eliminar la solicitud de '+nombre+'? Esta acción no se puede deshacer.'))return;
+try{
+await db.ref('solicitudesTurno/'+id).remove();
+alert('Solicitud eliminada correctamente.');
+}catch(error){
+console.error('Error al eliminar solicitud:',error);
+alert('No se pudo eliminar la solicitud: '+error.message);
+}
+};
+window.crearOrdenDesdeTurno=async(id)=>{
+const t=solicitudesTurno.find(x=>x.id===id);
+if(!t||t.orderCreated)return;
+if(!confirm('¿Crear una orden de trabajo a partir de esta solicitud?'))return;
+const uid=crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random().toString(16).slice(2);
+const order={
+id:uid,number:'OT-'+String(Date.now()).slice(-6),qrToken:secureToken(),
+date:today(),clientLabel:t.name+' · '+t.phone,vehicleLabel:t.vehicle,service:t.service,
+status:'Pendiente',km:'',total:'',description:'Solicitud de turno para '+t.date,
+notes:t.details||t.notes||''
+};
+store.orders.push(order);
+const ok=await save();
+if(!ok){store.orders=store.orders.filter(o=>o.id!==uid);renderAll();return;}
+try{
+await db.ref('solicitudesTurno/'+id).update({
+orderCreated:true,orderId:uid,status:'aceptado',
+updatedAt:firebase.database.ServerValue.TIMESTAMP
+});
+alert('Orden '+order.number+' creada. Podés verla en Órdenes y generar su QR.');
+}catch(e){alert('La orden se guardó, pero no se pudo actualizar la solicitud: '+e.message);}
+};
+
+/* QR DE ORDEN Y SEGUIMIENTO */
+window.shareOrderQr=(id)=>{
+const o=store.orders.find(x=>x.id===id);if(!o)return;
+const url=new URL('seguimiento.html',location.href);
+url.searchParams.set('token',o.qrToken||(o.qrToken=secureToken()));
+const phone=store.clients.find(c=>c.name+' · '+c.phone===o.clientLabel)?.phone||'';
+showQr('QR de '+o.number,`${o.vehicleLabel||'Vehículo'} · ${o.clientLabel||'Cliente'} · ${o.status}`,url.href,phone.replace(/\D/g,''));
+};
+window.editItem=(type,id)=>{
+const item=store[type].find(x=>x.id===id);
+if(type==='clients')openClient(item);
+if(type==='vehicles')openVehicle(item);
+if(type==='orders')openOrder(item);
+};
+window.del=del;
+window.removeService=removeService;
+function renderAll(){
+renderClients();renderVehicles();renderOrders();renderServices();
+$('#statClients').textContent=store.clients.length;
+$('#statVehicles').textContent=store.vehicles.length;
+$('#statOrders').textContent=store.orders.length;
+$('#statPending').textContent=store.orders.filter(o=>!['Finalizada','Entregada'].includes(o.status)).length;
+const recent=[...store.orders].sort((a,b)=>String(b.date).localeCompare(String(a.date))).slice(0,5);
+$('#recentOrders').innerHTML=recent.length
+?table(['Orden','Fecha','Vehículo','Estado','Total'],recent.map(o=>`<tr><td><strong>${esc(o.number)}</strong></td><td>${esc(o.date)}</td><td>${esc(o.vehicleLabel)}</td><td><span class="badge">${esc(o.status)}</span></td><td>${money(o.total)}</td></tr>`))
+:'<div class="empty">Todavía no hay órdenes de trabajo.</div>';
+renderTurnos();
+}
+['searchClients','searchVehicles','searchOrders'].forEach(id=>{
+$('#'+id).addEventListener('input',()=>({searchClients:renderClients,searchVehicles:renderVehicles,searchOrders:renderOrders}[id])());
+});
+renderAll();
+connectFirebase();
+</script>
+</body>
+</html>
