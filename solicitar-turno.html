@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -11,37 +12,39 @@
   --navy:#102c49;
   --gold:#e4bd58;
   --bg:#f3f6fa;
+  --line:#e4eaf1;
 }
-* { box-sizing:border-box; }
-body {
+*{box-sizing:border-box}
+body{
   margin:0;
   padding:18px;
   background:var(--bg);
-  font:15px/1.5 system-ui,Arial;
   color:#172536;
+  font:15px/1.5 system-ui,Arial,sans-serif;
 }
-.card {
-  max-width:560px;
-  margin:25px auto;
+main{max-width:560px;margin:25px auto}
+.card{
   background:white;
+  border:1px solid var(--line);
   border-radius:18px;
   padding:24px;
   box-shadow:0 8px 24px #102c4910;
 }
-.brand {
+.brand{
+  font-weight:900;
   color:var(--navy);
-  font-weight:850;
   letter-spacing:2px;
+  font-size:20px;
 }
-h1 { color:var(--navy); }
-.muted { color:#718096; }
-label {
+h1{color:var(--navy);margin:12px 0 4px}
+.muted{color:#718096}
+label{
   display:block;
   font-weight:650;
   font-size:13px;
-  margin:13px 0 5px;
+  margin:14px 0 5px;
 }
-input,select,textarea {
+input,select,textarea{
   width:100%;
   padding:12px;
   border:1px solid #d7e0e9;
@@ -49,50 +52,57 @@ input,select,textarea {
   font:inherit;
   background:white;
 }
-button {
+button{
   width:100%;
   border:0;
   border-radius:9px;
   background:var(--navy);
   color:white;
-  padding:14px;
-  margin-top:18px;
-  font:inherit;
   font-weight:700;
+  padding:14px;
+  margin-top:20px;
+  font:inherit;
+  cursor:pointer;
 }
-button:disabled { opacity:.6; }
-#msg {
+button:disabled{opacity:.6}
+#message{
   display:none;
+  margin-top:15px;
   padding:13px;
-  margin-top:14px;
   border-radius:9px;
 }
+.ok{display:block!important;background:#e6f7f0;color:#137a57}
+.bad{display:block!important;background:#fff0f0;color:#9d3333}
 </style>
 </head>
 
 <body>
-<main class="card">
+<main>
+<section class="card">
 
 <div class="brand">AUTO REGINA</div>
 
 <h1>Solicitar un turno</h1>
 
 <p class="muted">
-Completá tus datos y enviá tu solicitud al taller.
+Completá tus datos y el taller recibirá tu solicitud.
 </p>
 
-<form id="f">
+<form id="form">
 
 <label>Nombre y apellido</label>
-<input name="name" required>
+<input name="name" required maxlength="100"
+placeholder="Tu nombre">
 
 <label>Teléfono / WhatsApp</label>
-<input name="phone" type="tel" required>
+<input name="phone" type="tel" required maxlength="30"
+placeholder="Tu teléfono">
 
 <label>Vehículo</label>
-<input name="vehicle" placeholder="Marca y modelo" required>
+<input name="vehicle" required maxlength="100"
+placeholder="Marca, modelo y patente">
 
-<label>Servicio</label>
+<label>Servicio solicitado</label>
 <select name="service" required>
 <option value="">Seleccionar...</option>
 <option>Mecánica general</option>
@@ -107,19 +117,26 @@ Completá tus datos y enviá tu solicitud al taller.
 </select>
 
 <label>Fecha preferida</label>
-<input name="date" type="date" id="date" required>
+<input name="date" type="date" required>
 
-<label>Comentarios</label>
-<textarea name="notes" rows="3"></textarea>
+<label>Comentarios (opcional)</label>
+<textarea name="details" rows="3"
+placeholder="Contanos qué necesita tu vehículo"></textarea>
 
-<button type="submit" id="send">
+<button id="send" type="submit">
 ENVIAR SOLICITUD
 </button>
 
+<div id="message" role="status"></div>
+
 </form>
+</section>
 
-<div id="msg"></div>
-
+<p class="muted" style="text-align:center;font-size:12px">
+Auto Regina · Servicio mecánico
+<br>
+La solicitud no confirma automáticamente el turno.
+</p>
 </main>
 
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
@@ -143,61 +160,52 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
 
-const form = document.getElementById('f');
-const button = document.getElementById('send');
-const msg = document.getElementById('msg');
+const form = document.getElementById('form');
+const msg = document.getElementById('message');
+const btn = document.getElementById('send');
 
-document.getElementById('date').min =
-  new Date().toISOString().slice(0,10);
-
-function mensaje(texto, error=false) {
-  msg.style.display = 'block';
-  msg.style.background = error ? '#fff0f0' : '#e6f7f0';
-  msg.style.color = error ? '#b42318' : '#137a57';
-  msg.textContent = texto;
-}
-
-form.addEventListener('submit', async function(e) {
+form.addEventListener('submit', async e => {
   e.preventDefault();
 
-  button.disabled = true;
-  button.textContent = 'ENVIANDO...';
+  btn.disabled = true;
+  btn.textContent = 'ENVIANDO...';
+
+  msg.style.display = 'none';
 
   try {
-    const user = await auth.signInAnonymously();
 
-    const data = {
-      name: form.name.value.trim(),
-      phone: form.phone.value.trim(),
-      vehicle: form.vehicle.value.trim(),
-      service: form.service.value,
-      date: form.date.value,
-      notes: form.notes.value.trim(),
-      status: 'pendiente',
-      createdAt: firebase.database.ServerValue.TIMESTAMP
-    };
+    await auth.signInAnonymously();
 
-    if (!data.name || !data.phone || !data.vehicle) {
-      throw new Error('Completá todos los datos obligatorios.');
-    }
-
-    await db.ref('solicitudesTurno').push(data);
-
-    mensaje(
-      '¡Solicitud enviada correctamente! El taller recibió tus datos. Se comunicarán con vos para confirmar el turno.'
+    const d = Object.fromEntries(
+      new FormData(form).entries()
     );
+
+    d.status = 'Pendiente';
+    d.createdAt = Date.now();
+
+    await db.ref('solicitudesTurno').push(d);
+
+    msg.textContent =
+      '¡Solicitud enviada correctamente! Auto Regina se comunicará para confirmar tu turno.';
+
+    msg.className = 'ok';
 
     form.reset();
 
-  } catch(error) {
-    console.error(error);
-    mensaje(
-      'No se pudo enviar la solicitud: ' + error.message,
-      true
-    );
+  } catch(err) {
+
+    console.error(err);
+
+    msg.textContent =
+      'No se pudo enviar la solicitud. Revisá la conexión o las reglas de Firebase.';
+
+    msg.className = 'bad';
+
   } finally {
-    button.disabled = false;
-    button.textContent = 'ENVIAR SOLICITUD';
+
+    btn.disabled = false;
+    btn.textContent = 'ENVIAR SOLICITUD';
+
   }
 });
 </script>
